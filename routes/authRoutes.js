@@ -1,0 +1,17 @@
+const express = require('express');
+const router = express.Router();
+const authController = require('../controllers/authController');
+const linkedinScrapingController = require('../controllers/linkedinScrapingController');
+const scrapeController = require('../controllers/scrapeController');
+const authenticateToken = require('../middlewares/authMiddleware');
+const { registerValidation ,loginValidation } = require('../validators/authValidator');
+const validate = require('../middlewares/validationHandler');
+//router.post('/register', authController.register);
+router.post('/register', registerValidation, validate, authController.register);
+router.post('/login',  loginValidation, validate, authController.login);
+router.get('/profile', authenticateToken, authController.profile);
+//router.post('/scrapeLinkedIn',linkedinScrapingController.scrapeLinkedIn);
+router.post('/scrapeBrightdata',scrapeController.scrapeLinkedInKeywords);
+router.get('/scrapeLinkedInDataInsert',scrapeController.scrapeLinkedInDataInsert);
+// router.post('/scrapeLinkedIn',authenticateToken,linkedinScrapingController.scrapeLinkedIn);
+module.exports = router;
