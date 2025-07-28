@@ -1,0 +1,16 @@
+# Ensure text files use LF line endings in the repository
+* text=auto eol=lf
+
+# Explicitly set JSON, JavaScript, and config files to LF
+*.json text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.env text eol=lf
+*.example text eol=lf
+package.json text eol=lf
+package-lock.json text eol=lf
+
+# Binary files (no line ending conversion)
+*.png binary
+*.jpg binary
+*.pdf binary
