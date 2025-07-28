@@ -8,7 +8,7 @@ require('./models/LinkedInProfile');
 
 const authRoutes = require('./routes/authRoutes');
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 
 
 // Middleware
@@ -29,12 +29,20 @@ async function startServer() {
     await sequelize.sync({ force: false });
     console.log('Database synced');
 
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      app.listen(port, () => {
+        console.log(`Server running on port ${port}`);
+      });
+    }
   } catch (err) {
     console.error('Unable to connect to database:', err);
   }
 }
 
-startServer();
+// Start server in development, but not when deployed to Vercel
+if (process.env.NODE_ENV !== 'production') {
+  startServer();
+}
+
+// Export the Express app for Vercel
+module.exports = app;
