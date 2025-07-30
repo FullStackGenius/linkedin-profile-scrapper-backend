@@ -19,7 +19,10 @@ app.use(express.json());
 app.use('/api', authRoutes);
 
 
-
+// API test route
+app.get('/api/test', (req, res) => {
+  res.status(200).json({ message: 'API is working properly '+process.env.BRIGHTDATA_API_KEY });
+});
 
 async function startServer() {
   try {
