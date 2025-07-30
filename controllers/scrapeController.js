@@ -92,3 +92,23 @@ exports.scrapeLinkedInDataInsert = async (req, res) => {
     res.status(500).json({ error: 'Failed to process webhook data' });
   }
 };
+
+
+exports.test123 = async (req, res) => {
+  try {
+   
+    return res.status(200).json({
+      status: true,
+      message: "Scraping request sent to BrightData successfully.",
+      data: ""
+    });
+  } catch (error) {
+    console.error("BrightData Scraping Error:", error?.response?.data || error.message);
+
+    return res.status(500).json({
+      status: false,
+      message: "Failed to trigger scraping via BrightData.",
+      error: error?.response?.data || error.message
+    });
+  }
+};
