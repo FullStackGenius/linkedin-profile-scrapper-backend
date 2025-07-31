@@ -55,8 +55,27 @@ exports.scrapeLinkedInDataInsert = async (req, res) => {
           where: { linkedin_id: profile.linkedin_id },
           defaults: {
             linkedin_id: profile.linkedin_id, // e.g., "priyanka-mandrekar-3692a4219"
-            profile_id: profile.id,           // e.g., same as linkedin_id or a separate field
             url: profile.url || '',           // e.g., https://www.linkedin.com/in/...
+            name: profile.name,
+            city: profile.city,
+            country_code: profile.country_code,
+            position: profile.position,
+            about: profile.about,
+            educations_details: profile.educations_details,
+            avatar: profile.avatar,
+            followers: profile.followers,
+            connections: profile.connections,
+            current_company_company_id: profile.current_company_company_id,
+            current_company_name: profile.current_company_name,
+            location: profile.location,
+            input_url: profile.input_url,
+            linkedin_num_id: profile.linkedin_num_id,
+            banner_image: profile.banner_image,
+            default_avatar: profile.default_avatar,
+            memorialized_account: profile.memorialized_account,
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+            timestamp: profile.timestamp,
             createdAt: new Date(),
             updatedAt: new Date()
           }
@@ -85,81 +104,9 @@ exports.scrapeLinkedInDataInsert = async (req, res) => {
 
 
 
-// Webhook endpoint to receive LinkedIn profile data
-// exports.scrapeLinkedInDataInsert = async (req, res) => {
-//   try {
-//     const profiles = req.body.data; // JSON data from webhook
-//     if (!Array.isArray(profiles)) {
-//       return res.status(400).json({ error: 'Input must be an array of profiles' });
-//     }
-
-//     const insertedProfiles = [];
-//     for (const profile of profiles) {
-//       const [record, created] = await LinkedInProfile.findOrCreate({
-//         where: { linkedin_id: profile.linkedin_id },
-//         defaults: {
-//           linkedin_id: profile.linkedin_id,
-//           name: profile.name,
-//           first_name: profile.first_name,
-//           last_name: profile.last_name,
-//           city: profile.city,
-//           country_code: profile.country_code,
-//           position: profile.position,
-//           posts: profile.posts,
-//           current_company: profile.current_company,
-//           experience: profile.experience,
-//           education: profile.education,
-//           url: profile.url,
-//           input_url: profile.input_url,
-//           avatar: profile.avatar,
-//           banner_image: profile.banner_image,
-//           activity: profile.activity,
-//           linkedin_num_id: profile.linkedin_num_id,
-//           honors_and_awards: profile.honors_and_awards,
-//           similar_profiles: profile.similar_profiles,
-//           default_avatar: profile.default_avatar,
-//           memorialized_account: profile.memorialized_account,
-//           bio_links: profile.bio_links,
-//           timestamp: profile.timestamp
-//         }
-//       });
-
-//       insertedProfiles.push({
-//         linkedin_id: record.linkedin_id,
-//         created: created,
-//         message: created ? 'Profile inserted' : 'Profile already exists'
-//       });
-//     }
-
-//     res.status(200).json({
-//       message: 'Webhook data processed successfully',
-//       data: insertedProfiles
-//     });
-//   } catch (error) {
-//     console.error('Error processing webhook data:', error);
-//     res.status(500).json({ error: 'Failed to process webhook data' });
-//   }
-// };
 
 
-// exports.test123 = async (req, res) => {
-//   try {
-   
-//     return res.status(200).json({
-//       status: true,
-//       message: "Scraping request sent to BrightData successfully.",
-//       data: ""
-//     });
-//   } catch (error) {
-//     console.error("BrightData Scraping Error:", error?.response?.data || error.message);
 
-//     return res.status(500).json({
-//       status: false,
-//       message: "Failed to trigger scraping via BrightData.",
-//       error: error?.response?.data || error.message
-//     });
-//   }
-// };
 
 
 exports.test123 = async (req, res) => {

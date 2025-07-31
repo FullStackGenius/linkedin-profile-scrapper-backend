@@ -23,6 +23,17 @@ const sequelize = require('../config/db');
       allowNull: true,
       comment: 'Last name'
     },
+    about: {
+  type: DataTypes.TEXT('long'), // Use 'long' for large text like bios
+  allowNull: true,
+  comment: 'About/Bio section of the profile'
+},
+educations_details: {
+  type: DataTypes.TEXT('long'),
+  allowNull: true,
+  comment: 'JSON string of all education details'
+},
+
     city: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -78,6 +89,31 @@ const sequelize = require('../config/db');
       allowNull: true,
       comment: 'Profile banner image URL'
     },
+    followers: {
+  type: DataTypes.INTEGER,
+  allowNull: true,
+  comment: 'Total number of followers'
+},
+connections: {
+  type: DataTypes.INTEGER,
+  allowNull: true,
+  comment: 'Total number of LinkedIn connections'
+},
+current_company_company_id: {
+  type: DataTypes.STRING,
+  allowNull: true,
+  comment: 'ID of the current company from LinkedIn'
+},
+current_company_name: {
+  type: DataTypes.STRING,
+  allowNull: true,
+  comment: 'Name of the current company from LinkedIn'
+},
+location: {
+  type: DataTypes.STRING,
+  allowNull: true,
+  comment: 'Full location of the user'
+},
     activity: {
       type: DataTypes.JSON,
       allowNull: true,
