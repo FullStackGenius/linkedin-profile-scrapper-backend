@@ -1,7 +1,7 @@
 const axios = require("axios");
 const fs = require('fs');
 const path = require('path');
-const User = require('../models/LinkedInProfile');
+const LinkedInProfile = require('../models/LinkedInProfile');
 
 exports.scrapeLinkedInKeywords = async (req, res) => {
   try {
