@@ -1,5 +1,6 @@
 const axios = require("axios");
-
+const fs = require('fs');
+const path = require('path');
 
 
 exports.scrapeLinkedInKeywords = async (req, res) => {
@@ -94,20 +95,55 @@ exports.scrapeLinkedInDataInsert = async (req, res) => {
 };
 
 
+// exports.test123 = async (req, res) => {
+//   try {
+   
+//     return res.status(200).json({
+//       status: true,
+//       message: "Scraping request sent to BrightData successfully.",
+//       data: ""
+//     });
+//   } catch (error) {
+//     console.error("BrightData Scraping Error:", error?.response?.data || error.message);
+
+//     return res.status(500).json({
+//       status: false,
+//       message: "Failed to trigger scraping via BrightData.",
+//       error: error?.response?.data || error.message
+//     });
+//   }
+// };
+
+
 exports.test123 = async (req, res) => {
   try {
-   
+    // Get request data (POST body)
+    const requestData = req.body;
+
+    // Define filename with timestamp (optional)
+    const fileName = `scrape_input_${Date.now()}.json`;
+
+    // Define path (you can adjust the folder)
+    const filePath = path.join(__dirname, '../logs/', fileName);
+
+    // Ensure logs directory exists
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+
+    // Write JSON data to file
+    fs.writeFileSync(filePath, JSON.stringify(requestData, null, 2), 'utf8');
+
+    // Respond success
     return res.status(200).json({
       status: true,
-      message: "Scraping request sent to BrightData successfully.",
-      data: ""
+      message: "Data received and saved to JSON file.",
+      file: fileName,
     });
   } catch (error) {
     console.error("BrightData Scraping Error:", error?.response?.data || error.message);
 
     return res.status(500).json({
       status: false,
-      message: "Failed to trigger scraping via BrightData.",
+      message: "Failed to save request data.",
       error: error?.response?.data || error.message
     });
   }
