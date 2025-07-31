@@ -54,8 +54,8 @@ exports.scrapeLinkedInDataInsert = async (req, res) => {
         const [record, created] = await LinkedInProfile.findOrCreate({
           where: { linkedin_id: profile.linkedin_id },
           defaults: {
-            linkedin_id: profile.linkedin_id, // e.g., "priyanka-mandrekar-3692a4219"
-            url: profile.url || '',           // e.g., https://www.linkedin.com/in/...
+            linkedin_id: profile.linkedin_id, 
+            url: profile.url || '', 
             name: profile.name,
             city: profile.city,
             country_code: profile.country_code,
@@ -108,7 +108,97 @@ exports.scrapeLinkedInDataInsert = async (req, res) => {
 };
 
 
+exports.getAllLinkedinProfiles = async (req, res) => {
+  try {
+    // Pagination parameters
+    const { page = 1, limit = 100 } = req.query;
+    const offset = (page - 1) * limit;
 
+    // Fetch profiles with pagination
+    const profiles = await LinkedInProfile.findAll({
+      attributes: [
+        'id',
+        'linkedin_id',
+        'name',
+        'first_name',
+        'last_name',
+        'about',
+        'educations_details',
+        'city',
+        'country_code',
+        'position',
+        'posts',
+        'current_company',
+        'experience',
+        'education',
+        'url',
+        'input_url',
+        'avatar',
+        'banner_image',
+        'followers',
+        'connections',
+        'current_company_company_id',
+        'current_company_name',
+        'location',
+        'activity',
+        'linkedin_num_id',
+        'honors_and_awards',
+        'similar_profiles',
+        'default_avatar',
+        'memorialized_account',
+        'bio_links',
+        'timestamp',
+        'createdAt',
+        'updatedAt',
+      ],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+    });
+
+    // Log to JSON file
+    // let fileName;
+    // try {
+    //   fileName = `linkedin_profiles_${Date.now()}.json`;
+    //   const filePath = path.join(__dirname, '../logs/', fileName);
+    //   fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    //   fs.writeFileSync(filePath, JSON.stringify(profiles, null, 2), 'utf8');
+    // } catch (fileError) {
+    //   console.error('File Write Error:', {
+    //     name: fileError.name,
+    //     message: fileError.message,
+    //     stack: fileError.stack,
+    //   });
+    //   // Continue execution even if file writing fails
+    // }
+
+    // Get total count for pagination
+    const totalCount = await LinkedInProfile.count();
+
+    return res.status(200).json({
+      status: true,
+      message: 'LinkedIn profiles fetched successfully.',
+      data: {
+       profiles, 
+        total: totalCount,
+        page: parseInt(page),
+      limit: parseInt(limit),
+      }
+     
+     // file: fileName || null,
+    });
+  } catch (error) {
+    console.error('Get LinkedIn Profiles Error:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    });
+    return res.status(500).json({
+      status: false,
+      message: 'Failed to fetch LinkedIn profiles.',
+      error: error.message,
+    });
+  }
+};
 
 
 
