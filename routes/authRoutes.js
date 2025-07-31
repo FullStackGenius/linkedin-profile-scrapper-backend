@@ -12,7 +12,7 @@ router.post('/login',  loginValidation, validate, authController.login);
 router.get('/profile', authenticateToken, authController.profile);
 //router.post('/scrapeLinkedIn',linkedinScrapingController.scrapeLinkedIn);
 router.post('/scrapeBrightdata',scrapeController.scrapeLinkedInKeywords);
-router.get('/scrapeLinkedInDataInsert',scrapeController.scrapeLinkedInDataInsert);
+router.post('/scrapeLinkedInDataInsert',scrapeController.scrapeLinkedInDataInsert);
 // router.post('/scrapeLinkedIn',authenticateToken,linkedinScrapingController.scrapeLinkedIn);
 router.post('/test123',scrapeController.test123);
 module.exports = router;
