@@ -40,63 +40,48 @@ exports.scrapeLinkedInKeywords = async (req, res) => {
 
 exports.scrapeLinkedInDataInsert = async (req, res) => {
   try {
-    const profiles = req.body;
+    const profiles = req.body; // expecting an array directly
 
     if (!Array.isArray(profiles)) {
       return res.status(400).json({ error: 'Input must be an array of profiles' });
     }
 
-    fs.writeFileSync('linkedin_profiles.json', JSON.stringify(profiles, null, 2)); // <-- Save to file
-
     const insertedProfiles = [];
 
     for (const profile of profiles) {
-      const [record, created] = await LinkedInProfile.findOrCreate({
-        where: { linkedin_id: profile.linkedin_id },
-        defaults: {
-          linkedin_id: profile.linkedin_id,
-          name: profile.name,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          city: profile.city,
-          country_code: profile.country_code,
-          position: profile.position,
-          posts: profile.posts,
-          current_company: profile.current_company,
-          experience: profile.experience,
-          education: profile.education,
-          url: profile.url,
-          input_url: profile.input_url,
-          avatar: profile.avatar,
-          banner_image: profile.banner_image,
-          activity: profile.activity,
-          linkedin_num_id: profile.linkedin_num_id,
-          honors_and_awards: profile.honors_and_awards,
-          similar_profiles: profile.similar_profiles,
-          default_avatar: profile.default_avatar,
-          memorialized_account: profile.memorialized_account,
-          bio_links: profile.bio_links,
-          timestamp: profile.timestamp
-        }
-      });
+      try {
+        const [record, created] = await LinkedInProfile.findOrCreate({
+          where: { linkedin_id: profile.linkedin_id },
+          defaults: {
+            linkedin_id: profile.linkedin_id, // e.g., "priyanka-mandrekar-3692a4219"
+            profile_id: profile.id,           // e.g., same as linkedin_id or a separate field
+            url: profile.url || '',           // e.g., https://www.linkedin.com/in/...
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }
+        });
 
-      insertedProfiles.push({
-        linkedin_id: record.linkedin_id,
-        created,
-        message: created ? 'Profile inserted' : 'Profile already exists'
-      });
+        insertedProfiles.push({
+          linkedin_id: record.linkedin_id,
+          created,
+          message: created ? 'Profile inserted' : 'Profile already exists'
+        });
+      } catch (err) {
+        console.error(`Error inserting profile ${profile.linkedin_id}:`, err.message);
+      }
     }
 
-    res.status(200).json({
-      message: 'Webhook data processed successfully',
+    return res.status(200).json({
+      message: 'Minimal LinkedIn profile data processed successfully',
       data: insertedProfiles
     });
-
   } catch (error) {
-    console.error('Error processing webhook data:', error);
-    res.status(500).json({ error: 'Failed to process webhook data' });
+    console.error('Fatal Error:', error.stack || error);
+    return res.status(500).json({ error: 'Failed to process webhook data' });
   }
 };
+
+
 
 
 // Webhook endpoint to receive LinkedIn profile data
