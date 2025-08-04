@@ -14,6 +14,7 @@ router.get('/profile', authenticateToken, authController.profile);
 router.post('/scrapeBrightdata',scrapeController.scrapeLinkedInKeywords);
 router.post('/scrapeLinkedInDataInsert',scrapeController.scrapeLinkedInDataInsert);
 router.get('/getAllLinkedinProfiles',scrapeController.getAllLinkedinProfiles);
+router.post('/google-login', authController.googleLogin);
 // router.post('/scrapeLinkedIn',authenticateToken,linkedinScrapingController.scrapeLinkedIn);
 router.post('/test123',scrapeController.test123);
 module.exports = router;

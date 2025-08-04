@@ -16,6 +16,12 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false
   }
+  ,
+  googleId: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true
+  }
 }, {
   tableName: 'users',
   underscored: true, // 👈 This changes createdAt → created_at
