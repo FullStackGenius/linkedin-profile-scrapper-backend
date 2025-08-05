@@ -19,7 +19,7 @@ exports.scrapeLinkedInKeywords = async (req, res) => {
       }
     );
 
-    console.log("BrightData Trigger Response:", response.data);
+    // console.log("BrightData Trigger Response:", response.data);
     // Send basic response
     return res.status(200).json({
       status: true,

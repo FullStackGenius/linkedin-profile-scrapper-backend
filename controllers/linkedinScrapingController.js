@@ -65,7 +65,7 @@ exports.scrapeLinkedIn = async (req, res) => {
         message: 'Scraping timed out or failed to produce output.'
       });
     }
-    console.log(outputResponse.data.output);
+    // console.log(outputResponse.data.output);
 
     return res.status(200).json({
       status: true,
