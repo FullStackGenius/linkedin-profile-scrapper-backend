@@ -15,8 +15,8 @@ exports.phantombusterScraping = async (req, res) => {
       sessionCookie,
       linkedInSearchUrl,
       numberOfLinesPerLaunch = 10,
-      numberOfResultsPerLaunch = 5,
-      numberOfResultsPerSearch = 5,
+      numberOfResultsPerLaunch = 10,
+      numberOfResultsPerSearch = 10,
     } = req.body;
 
     if (!sessionCookie || !linkedInSearchUrl) {
