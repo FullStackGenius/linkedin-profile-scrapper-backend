@@ -17,6 +17,8 @@ exports.phantombusterScraping = async (req, res) => {
       numberOfLinesPerLaunch = 10,
       numberOfResultsPerLaunch = 10,
       numberOfResultsPerSearch = 10,
+      //  numberOfResultsPerLaunch = 10, // how many total results to return in one run (e.g., 5 results).
+      // numberOfResultsPerSearch = 10, //how many pages/searches to process per run (e.g., 2 searches).
     } = req.body;
 
     if (!sessionCookie || !linkedInSearchUrl) {
