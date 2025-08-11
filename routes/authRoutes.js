@@ -11,13 +11,15 @@ const validate = require('../middlewares/validationHandler');
 router.post('/register', registerValidation, authController.register);
 router.post('/login',  loginValidation, authController.login);
 router.get('/profile', authenticateToken, authController.profile);
+router.post('/update-profile', authenticateToken, authController.updateProfile);
+
 //router.post('/scrapeLinkedIn',linkedinScrapingController.scrapeLinkedIn);
-router.post('/scrapeBrightdata',scrapeController.scrapeLinkedInKeywords);
-router.post('/scrapeLinkedInDataInsert',scrapeController.scrapeLinkedInDataInsert);
-router.get('/getAllLinkedinProfiles',scrapeController.getAllLinkedinProfiles);
+router.post('/scrapeBrightdata',authenticateToken,scrapeController.scrapeLinkedInKeywords);
+router.post('/scrapeLinkedInDataInsert',authenticateToken,scrapeController.scrapeLinkedInDataInsert);
+router.get('/getAllLinkedinProfiles',authenticateToken,scrapeController.getAllLinkedinProfiles);
 router.post('/google-login', authController.googleLogin);
-router.post('/phantombuster-scraping', phantombusterScraping.phantombusterScraping);
-router.get('/linkedin-profiles-data', phantombusterScraping.LinkedinProfilesData);
+router.post('/phantombuster-scraping',authenticateToken, phantombusterScraping.phantombusterScraping);
+router.get('/linkedin-profiles-data',authenticateToken, phantombusterScraping.LinkedinProfilesData);
 
 // router.post('/scrapeLinkedIn',authenticateToken,linkedinScrapingController.scrapeLinkedIn);
 router.post('/test123',scrapeController.test123);

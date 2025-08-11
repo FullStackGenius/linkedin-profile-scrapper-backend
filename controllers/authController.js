@@ -2,6 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
+const { Op } = require('sequelize');
 require('dotenv').config();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -133,9 +134,9 @@ exports.profile = async (req, res) => {
   try {
     // Fetch fresh user data from DB (excluding password)
     const userInstance  = await User.findByPk(req.user.id, {
-      attributes: { exclude: ['password'] }
+      attributes: { exclude: ['password','googleId','updatedAt'] }
     });
-
+console.log(userInstance);
     if (!userInstance) {
       return res.status(404).json({
         status: false,
@@ -156,9 +157,7 @@ exports.profile = async (req, res) => {
     return res.status(200).json({
       status: true,
       message: 'Protected route accessed successfully',
-      data: {
-        user
-      }
+      data: user
     });
   } catch (error) {
     return res.status(500).json({
@@ -311,6 +310,70 @@ exports.googleLogin = async (req, res) => {
       status: false,
       message: 'Google login failed',
       error: err.message
+    });
+  }
+};
+
+
+
+
+
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email, profile_image } = req.body;
+    const userId = req.user.id; // ✅ Comes from JWT middleware
+
+    // 1️⃣ Ensure user exists
+    const userInstance = await User.findByPk(userId);
+    if (!userInstance) {
+      return res.status(404).json({
+        status: false,
+        message: 'User not found',
+      });
+    }
+
+    // 2️⃣ Check email uniqueness (if updating email)
+    if (email && email !== userInstance.email) {
+      const emailExists = await User.findOne({
+        where: {
+          email,
+          id: { [Op.ne]: userId }, // Exclude current user
+        },
+      });
+
+      if (emailExists) {
+        return res.status(400).json({
+          status: false,
+          message: 'Email is already in use by another account',
+        });
+      }
+    }
+
+    // 3️⃣ Update fields
+    await userInstance.update({
+      name: name ?? userInstance.name,
+      email: email ?? userInstance.email,
+      profile_image: profile_image ?? userInstance.profile_image,
+      updatedAt: new Date(),
+    });
+
+    // 4️⃣ Prepare safe response
+    const updatedUser = userInstance.get({ plain: true });
+    delete updatedUser.password;
+     delete updatedUser.googleId;
+      delete updatedUser.updatedAt;
+
+    return res.status(200).json({
+      status: true,
+      message: 'Profile updated successfully',
+      data: updatedUser ,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      message: 'Something went wrong',
+      error: error.message,
     });
   }
 };

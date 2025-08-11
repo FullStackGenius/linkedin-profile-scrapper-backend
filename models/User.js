@@ -21,7 +21,11 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
     unique: true
-  }
+  },
+  profile_image: {
+  type: DataTypes.STRING, // or TEXT if storing URLs
+  allowNull: true
+}
 }, {
   tableName: 'users',
   underscored: true, // 👈 This changes createdAt → created_at
