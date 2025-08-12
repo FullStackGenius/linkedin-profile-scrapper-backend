@@ -7,16 +7,11 @@ exports.phantombusterScraping = async (req, res) => {
   try {
     // 🟢 1. Get required variables from the request body
     const {
-      //   apiKey,
-      //   agentId,
-      //   identityId,
       sessionCookie,
       linkedInSearchUrl,
       numberOfLinesPerLaunch = 10,
-      numberOfResultsPerLaunch = 10,
-      numberOfResultsPerSearch = 10,
-      //  numberOfResultsPerLaunch = 10, // how many total results to return in one run (e.g., 5 results).
-      // numberOfResultsPerSearch = 10, //how many pages/searches to process per run (e.g., 2 searches).
+      numberOfResultsPerLaunch = 10, // how many total results to return in one run (e.g., 5 results).
+      numberOfResultsPerSearch = 10, //how many pages/searches to process per run (e.g., 2 searches).
     } = req.body;
 
     if (!sessionCookie || !linkedInSearchUrl) {
@@ -119,14 +114,12 @@ exports.phantombusterScraping = async (req, res) => {
                   schoolDateRange: item.schoolDateRange,
                   searchAccountFullName: item.searchAccountFullName,
                   searchAccountProfileId: item.searchAccountProfileId,
-                  followersCount: 100,
-                  connectionsCount: 100,
                 });
               }
             }
 
             // 2️⃣ Create CSV folder if not exists
-            // const exportDir = path.join(process.cwd(), 'exports');
+           
             const exportDir = path.join(process.cwd(), "public", "exports");
             if (!fs.existsSync(exportDir)) {
               fs.mkdirSync(exportDir);
@@ -159,12 +152,10 @@ exports.phantombusterScraping = async (req, res) => {
             const spreadsheetUrl = `${
               process.env.BASE_URL
             }/exports/${path.basename(csvFilePath)}`;
-            //const spreadsheetUrl ='https://obsidiantechno.com/abctest/linkedin-Sheet1.csv';
+          
 
             // Now launch second Phantom agent (like your scrapeLinkedInProfiles function)
-            // const spreadsheetUrl = req.body.spreadsheetUrl;
-            // const spreadsheetUrl = "https://docs.google.com/spreadsheets/d/14zQxZKgvbl7j6QKNREEKGKE2j-4K6L_EA9rkWNqdRcE";
-            //const spreadsheetUrl =   "https://obsidiantechno.com/abctest/linkedin_profileUrls.csv";
+          
             if (!spreadsheetUrl) {
               return res.status(400).json({
                 status: false,
@@ -191,16 +182,14 @@ exports.phantombusterScraping = async (req, res) => {
             const containerId2 = launchRes2.data.containerId;
             console.log(`🚀 Second agent launched. Container ID: ${containerId2}`);
 
-            // Poll for second agent result
+           
              await pollPhantomResult(containerId2, process.env.API_KEY);
 
-            //console.log(secondAgentData);
-
-            //console.log("✅ Result received:", resultObject);
+           
 
             const latestProfiles = await LinkedInUserData.findAll({
               order: [["id", "DESC"]], // newest first
-              limit: 10,
+              limit: parsedData.length,
             });
             return res.status(200).json({
               status: true,
@@ -319,26 +308,11 @@ async function pollPhantomResult(containerId, apiKey, pollInterval = 5000) {
         const resultObject = response?.data?.resultObject;
 
         if (resultObject) {
-          // resolve(JSON.parse(resultObject));
+         
           const parsedData = JSON.parse(resultObject);
-          //console.log(parsedData);
+        
           if (Array.isArray(parsedData)) {
-            //   for (const item of parsedData) {
-            //     const profileUrl = item.linkedinProfileUrl+"/"; // match field name
-
-            //     if (!profileUrl) continue; // skip if missing URL
-            // console.log(profileUrl);
-            //     // Example: item.followerCount & item.connectionCount come from LinkedIn data
-            //     await LinkedInUserData.update(
-            //       {
-            //         followersCount: item.linkedinFollowersCount || 0,
-            //         connectionsCount: item.linkedinConnectionsCount || 0
-            //       },
-            //       {
-            //         where: { profile_url: profileUrl }
-            //       }
-            //     );
-            //   }
+            
             for (const item of parsedData) {
               let profileUrl = item.linkedinProfileUrl?.trim();
 
