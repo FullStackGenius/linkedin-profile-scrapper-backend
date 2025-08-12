@@ -221,7 +221,7 @@ exports.phantombusterScraping = async (req, res) => {
       const resultUrl = `https://api.phantombuster.com/api/v2/containers/fetch-result-object?id=${containerId}`;
 
        const startTime = Date.now(); // track when polling starts
-  const TIMEOUT_MS = 2 * 60 * 1000; // 3 minutes
+  const TIMEOUT_MS = 2.5 * 60 * 1000; // 3 minutes
 
       const poll = async () => {
         console.log("⏳ Checking result...");
@@ -533,7 +533,7 @@ exports.LinkedinProfilesData = async (req, res) => {
 
 async function pollPhantomResult(containerId, apiKey, pollInterval = 5000) {
   const resultUrl = `https://api.phantombuster.com/api/v2/containers/fetch-result-object?id=${containerId}`;
- const maxPollingTime = 2 * 60 * 1000; // 3 minutes
+ const maxPollingTime = 2.5 * 60 * 1000; // 3 minutes
   const startTime = Date.now();
   return new Promise((resolve, reject) => {
     const poll = async () => {
