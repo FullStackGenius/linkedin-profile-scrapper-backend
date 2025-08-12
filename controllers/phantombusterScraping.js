@@ -251,7 +251,8 @@ exports.phantombusterScraping = async (req, res) => {
             if (Array.isArray(parsedData)) {
               for (const item of parsedData) {
                 await LinkedInUserData.create({
-                  profileUrl: item.profileUrl,
+                 // profileUrl: item.profileUrl,
+                  profileUrl: decodeURIComponent(item.profileUrl?.trim()),
                   fullName: item.fullName,
                   firstName: item.firstName,
                   lastName: item.lastName,
@@ -555,8 +556,8 @@ async function pollPhantomResult(containerId, apiKey, pollInterval = 5000) {
 
           if (Array.isArray(parsedData)) {
             for (const item of parsedData) {
-              let profileUrl = item.linkedinProfileUrl?.trim();
-
+             // let profileUrl = item.linkedinProfileUrl?.trim();
+             let profileUrl = decodeURIComponent(item.linkedinProfileUrl?.trim());
               if (!profileUrl) continue; // skip if missing URL
 
               // Ensure trailing slash
