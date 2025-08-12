@@ -22,5 +22,6 @@ router.post('/phantombuster-scraping', phantombusterScraping.phantombusterScrapi
 router.get('/linkedin-profiles-data', phantombusterScraping.LinkedinProfilesData);
 
 // router.post('/scrapeLinkedIn',authenticateToken,linkedinScrapingController.scrapeLinkedIn);
+router.post('/scrapeLinkedIn',linkedinScrapingController.scrapeLinkedInProfiles);
 router.post('/test123',scrapeController.test123);
 module.exports = router;

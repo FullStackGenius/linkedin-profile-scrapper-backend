@@ -117,6 +117,16 @@ error: {
   searchAccountProfileId: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+   followersCount: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    
+  },
+   connectionsCount: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+   
   }
 }, {
   tableName: 'linkedin_user_data',

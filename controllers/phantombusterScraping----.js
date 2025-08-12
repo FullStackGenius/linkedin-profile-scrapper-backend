@@ -14,9 +14,9 @@ exports.phantombusterScraping = async (req, res) => {
     //   identityId,
       sessionCookie,
       linkedInSearchUrl,
-      numberOfLinesPerLaunch = 2,
-      numberOfResultsPerLaunch = 2,
-      numberOfResultsPerSearch = 2,
+      numberOfLinesPerLaunch = 10,
+      numberOfResultsPerLaunch = 10,
+      numberOfResultsPerSearch = 10,
       //  numberOfResultsPerLaunch = 10, // how many total results to return in one run (e.g., 5 results).
       // numberOfResultsPerSearch = 10, //how many pages/searches to process per run (e.g., 2 searches).
     } = req.body;
@@ -124,73 +124,6 @@ exports.phantombusterScraping = async (req, res) => {
         });
       }
     }
-
-
-
-     // 2️⃣ Create CSV folder if not exists
-    // const exportDir = path.join(process.cwd(), 'exports');
-    const exportDir = path.join(process.cwd(), 'public', 'exports');
-    if (!fs.existsSync(exportDir)) {
-      fs.mkdirSync(exportDir);
-    }
-
-    // 3️⃣ Create timestamped file name
-    const timestamp = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15);
-    const csvFilePath = path.join(exportDir, `linkedin_profileUrls_${timestamp}.csv`);
-
-    // 4️⃣ Build CSV content
-    let csvContent = 'profileUrl\n';
-    parsedData.forEach(item => {
-      if (item.profileUrl) {
-        csvContent += `${item.profileUrl}\n`;
-      }
-    });
-
-    // 5️⃣ Save CSV file
-    fs.writeFileSync(csvFilePath, csvContent, 'utf8');
-    console.log(`✅ CSV file created at: ${csvFilePath}`);
-
-    // 6️⃣ Use this file for second PhantomBuster agent
-    // If your second agent accepts public URL, you need to upload this CSV somewhere (like your server's /public folder)
-    //const spreadsheetUrl = `${process.env.BASE_URL}/exports/${path.basename(csvFilePath)}`;
-    //const spreadsheetUrl ='https://obsidiantechno.com/abctest/linkedin-Sheet1.csv';
-
-// Now launch second Phantom agent (like your scrapeLinkedInProfiles function)
-    // const spreadsheetUrl = req.body.spreadsheetUrl;
-    // const spreadsheetUrl = "https://docs.google.com/spreadsheets/d/14zQxZKgvbl7j6QKNREEKGKE2j-4K6L_EA9rkWNqdRcE";
-  const spreadsheetUrl =   "https://obsidiantechno.com/abctest/linkedin_profileUrls.csv";
-    if (!spreadsheetUrl) {
-      return res.status(400).json({
-        status: false,
-        message: "spreadsheetUrl is required for second scraping.",
-      });
-    }
-
-    const launchPayload2 = {
-      id: process.env.PHANTOM_PROFILE_SCRAPER_ID,
-      argument: {
-        spreadsheetUrl,
-        sessionCookie: process.env.LINKEDIN_SESSION_COOKIE,
-        numberOfLinesPerLaunch: 10,
-        columnName: "profileUrl",
-      },
-    };
-
-    const launchRes2 = await axios.post(
-      "https://api.phantombuster.com/api/v2/agents/launch",
-      launchPayload2,
-      { headers }
-    );
-
-    const containerId2 = launchRes2.data.containerId;
-    console.log(`🚀 Second agent launched. Container ID: ${containerId2}`);
-
-    // Poll for second agent result
-    const secondAgentData = await pollPhantomResult(containerId2, process.env.API_KEY);
-
-//console.log(secondAgentData);
-
-
             //console.log("✅ Result received:", resultObject);
             return res.status(200).json({
               status: true,
@@ -298,49 +231,3 @@ exports.LinkedinProfilesData = async (req, res) => {
 
 
 
-async function pollPhantomResult(containerId, apiKey, pollInterval = 5000) {
-  const resultUrl = `https://api.phantombuster.com/api/v2/containers/fetch-result-object?id=${containerId}`;
-
-  return new Promise((resolve, reject) => {
-    const poll = async () => {
-      try {
-        const response = await axios.get(resultUrl, {
-          headers: { 'X-Phantombuster-Key': apiKey },
-        });
-
-        const resultObject = response?.data?.resultObject;
-
-        if (resultObject) {
-          // resolve(JSON.parse(resultObject));
-          const parsedData = JSON.parse(resultObject);
-console.log(parsedData);
-if (Array.isArray(parsedData)) {
-  for (const item of parsedData) {
-    const profileUrl = item.linkedinProfileUrl; // match field name
-
-    if (!profileUrl) continue; // skip if missing URL
-console.log(profileUrl);
-    // Example: item.followerCount & item.connectionCount come from LinkedIn data
-    await LinkedInUserData.update(
-      {
-        followersCount: item.linkedinFollowersCount || 0,
-        connectionsCount: item.linkedinConnectionsCount || 0
-      },
-      {
-        where: { profile_url: profileUrl }
-      }
-    );
-  }
-}
-resolve(JSON.parse(resultObject));
-        } else {
-          setTimeout(poll, pollInterval);
-        }
-      } catch (err) {
-        // You can retry or reject depending on your preference
-        setTimeout(poll, pollInterval);
-      }
-    };
-    poll();
-  });
-}

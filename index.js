@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-
+const path = require('path');
 require('dotenv').config();
 const sequelize = require('./config/db');
 require('./models/User'); 
@@ -17,8 +17,9 @@ app.use(express.json());
 
 // Routes
 app.use('/api', authRoutes);
+// app.use(express.static(path.join(process.cwd(), 'public')));
 
-
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 async function startServer() {
