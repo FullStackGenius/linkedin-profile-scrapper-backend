@@ -69,7 +69,7 @@ exports.phantombusterScraping = async (req, res) => {
       const resultUrl = `https://api.phantombuster.com/api/v2/containers/fetch-result-object?id=${containerId}`;
 
       const poll = async () => {
-         console.log("⏳ Checking result...");
+        console.log("⏳ Checking result...");
 
         try {
           const response = await axios.get(resultUrl, {
@@ -119,7 +119,7 @@ exports.phantombusterScraping = async (req, res) => {
             }
 
             // 2️⃣ Create CSV folder if not exists
-           
+
             const exportDir = path.join(process.cwd(), "public", "exports");
             if (!fs.existsSync(exportDir)) {
               fs.mkdirSync(exportDir);
@@ -152,10 +152,9 @@ exports.phantombusterScraping = async (req, res) => {
             const spreadsheetUrl = `${
               process.env.BASE_URL
             }/exports/${path.basename(csvFilePath)}`;
-          
 
             // Now launch second Phantom agent (like your scrapeLinkedInProfiles function)
-          
+
             if (!spreadsheetUrl) {
               return res.status(400).json({
                 status: false,
@@ -180,28 +179,37 @@ exports.phantombusterScraping = async (req, res) => {
             );
 
             const containerId2 = launchRes2.data.containerId;
-            console.log(`🚀 Second agent launched. Container ID: ${containerId2}`);
+            console.log(
+              `🚀 Second agent launched. Container ID: ${containerId2}`
+            );
 
-           
-             await pollPhantomResult(containerId2, process.env.API_KEY);
-
-           
+            await pollPhantomResult(containerId2, process.env.API_KEY);
 
             const latestProfiles = await LinkedInUserData.findAll({
               order: [["id", "DESC"]], // newest first
               limit: parsedData.length,
             });
+
+            try {
+              fs.unlinkSync(csvFilePath);
+              console.log(`🗑️ Deleted file: ${csvFilePath}`);
+            } catch (err) {
+              console.error(`❌ Error deleting file: ${err.message}`);
+            }
             return res.status(200).json({
               status: true,
               message: "Scraping successful",
               data: latestProfiles,
             });
           } else {
-             console.log("⌛ Result not ready yet. Retrying in 5s...");
+            console.log("⌛ Result not ready yet. Retrying in 5s...");
             setTimeout(poll, process.env.POLL_INTERVAL_MS);
           }
         } catch (err) {
-          console.error("❌ Error polling result:", err?.response?.data || err.message);
+          console.error(
+            "❌ Error polling result:",
+            err?.response?.data || err.message
+          );
           setTimeout(poll, process.env.POLL_INTERVAL_MS);
         }
       };
@@ -211,7 +219,10 @@ exports.phantombusterScraping = async (req, res) => {
 
     await pollForResult();
   } catch (error) {
-    console.error("❌ Phantombuster Scraping Error:", error?.response?.data || error.message);
+    console.error(
+      "❌ Phantombuster Scraping Error:",
+      error?.response?.data || error.message
+    );
 
     return res.status(500).json({
       status: false,
@@ -308,11 +319,9 @@ async function pollPhantomResult(containerId, apiKey, pollInterval = 5000) {
         const resultObject = response?.data?.resultObject;
 
         if (resultObject) {
-         
           const parsedData = JSON.parse(resultObject);
-        
+
           if (Array.isArray(parsedData)) {
-            
             for (const item of parsedData) {
               let profileUrl = item.linkedinProfileUrl?.trim();
 
