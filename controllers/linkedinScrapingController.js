@@ -96,20 +96,6 @@ const LinkedInUserData = require('../models/LinkedInUserData');
 exports.scrapeLinkedInProfiles = async (req, res) => {
   try {
     const { spreadsheetUrl } = req.body;
- await LinkedInUserData.update(
-      {
-        followersCount: 100,
-        connectionsCount: 100
-      },
-      {
-        where: { profile_url: "https://www.linkedin.com/in/jamescrstn/" }
-      }
-    );
-return res.status(200).json({
-            status: 'success',
-            message: 'Scraping completed successfully',
-            data: "parsedData"
-          });
 
     // Validate required input
     if (!spreadsheetUrl) {
@@ -149,71 +135,65 @@ return res.status(200).json({
 
     console.log(`🚀 Phantom launched. Polling container ID: ${containerId}`);
 
-    // Step 2: Poll for results
-    const resultUrl = `https://api.phantombuster.com/api/v2/containers/fetch-result-object?id=${containerId}`;
-    const POLL_INTERVAL_MS = 5000;
 
-    const poll = async () => {
-      console.log("⏳ Checking result...");
+   await pollPhantomResult(containerId, process.env.API_KEY);
 
-      try {
-        const response = await axios.get(resultUrl, {
-          headers: {
-            'X-Phantombuster-Key': process.env.API_KEY,
-          },
-        });
-
-        const resultObject = response?.data?.resultObject;
-
-        if (resultObject) {
-          const parsedData = JSON.parse(resultObject);
-
-          // Example: Save data to DB
-          if (Array.isArray(parsedData)) {
-            for (const item of parsedData) {
-
-              const profileUrl = item.linkedinProfileUrl+"/"; // match field name
-
-    if (!profileUrl) continue; // skip if missing URL
-
-    // Example: item.followerCount & item.connectionCount come from LinkedIn data
-    await LinkedInUserData.update(
-      {
-        followersCount: item.linkedinFollowersCount || 0,
-        connectionsCount: item.linkedinConnectionsCount || 0
-      },
-      {
-        where: { profile_url: profileUrl }
-      }
-    );
-              // await LinkedInUserData.create({
-              //   profileUrl: item.profileUrl,
-              //   fullName: item.fullName,
-              //   headline: item.headline,
-              //   location: item.location,
-              //   company: item.company,
-              //   jobTitle: item.jobTitle,
-              //   timestamp: item.timestamp,
-              // });
-            }
-          }
-
-          return res.status(200).json({
+    return res.status(200).json({
             status: 'success',
             message: 'Scraping completed successfully',
-            data: parsedData
+            data: "test"
           });
-        } else {
-          console.log("⌛ Result not ready yet. Retrying in 5s...");
-          setTimeout(poll, POLL_INTERVAL_MS);
-        }
-      } catch (err) {
-        console.error("❌ Error polling result:", err?.response?.data || err.message);
-        setTimeout(poll, POLL_INTERVAL_MS);
-      }
-    };
 
-    poll();
+    // Step 2: Poll for results
+    // const resultUrl = `https://api.phantombuster.com/api/v2/containers/fetch-result-object?id=${containerId}`;
+    // const POLL_INTERVAL_MS = 5000;
+
+    // const poll = async () => {
+    //   console.log("⏳ Checking result...");
+
+    //   try {
+    //     const response = await axios.get(resultUrl, {
+    //       headers: {
+    //         'X-Phantombuster-Key': process.env.API_KEY,
+    //       },
+    //     });
+
+    //     const resultObject = response?.data?.resultObject;
+
+    //     if (resultObject) {
+    //       const parsedData = JSON.parse(resultObject);
+
+    //       // Example: Save data to DB
+    //       if (Array.isArray(parsedData)) {
+    //         for (const item of parsedData) {
+    //           // await LinkedInUserData.create({
+    //           //   profileUrl: item.profileUrl,
+    //           //   fullName: item.fullName,
+    //           //   headline: item.headline,
+    //           //   location: item.location,
+    //           //   company: item.company,
+    //           //   jobTitle: item.jobTitle,
+    //           //   timestamp: item.timestamp,
+    //           // });
+    //         }
+    //       }
+
+    //       return res.status(200).json({
+    //         status: 'success',
+    //         message: 'Scraping completed successfully',
+    //         data: parsedData
+    //       });
+    //     } else {
+    //       console.log("⌛ Result not ready yet. Retrying in 5s...");
+    //       setTimeout(poll, POLL_INTERVAL_MS);
+    //     }
+    //   } catch (err) {
+    //     console.error("❌ Error polling result:", err?.response?.data || err.message);
+    //     setTimeout(poll, POLL_INTERVAL_MS);
+    //   }
+    // };
+
+    // poll();
 
   } catch (error) {
     console.error('LinkedIn Scraping Error:', error?.response?.data || error.message);
@@ -224,3 +204,82 @@ return res.status(200).json({
     });
   }
 };
+
+
+
+async function pollPhantomResult(containerId, apiKey, pollInterval = 5000) {
+  const resultUrl = `https://api.phantombuster.com/api/v2/containers/fetch-result-object?id=${containerId}`;
+
+  return new Promise((resolve, reject) => {
+    const poll = async () => {
+      try {
+        const response = await axios.get(resultUrl, {
+          headers: { 'X-Phantombuster-Key': apiKey },
+        });
+
+        const resultObject = response?.data?.resultObject;
+
+        if (resultObject) {
+          // resolve(JSON.parse(resultObject));
+          const parsedData = JSON.parse(resultObject);
+console.log(parsedData);
+if (Array.isArray(parsedData)) {
+//   for (const item of parsedData) {
+//     const profileUrl = item.linkedinProfileUrl+"/"; // match field name
+
+//     if (!profileUrl) continue; // skip if missing URL
+// console.log(profileUrl);
+//     // Example: item.followerCount & item.connectionCount come from LinkedIn data
+//     await LinkedInUserData.update(
+//       {
+//         followersCount: item.linkedinFollowersCount || 0,
+//         connectionsCount: item.linkedinConnectionsCount || 0
+//       },
+//       {
+//         where: { profileUrl: profileUrl }
+//       }
+//     );
+//   }
+
+for (const item of parsedData) {
+  let profileUrl = item.linkedinProfileUrl?.trim();
+
+  if (!profileUrl) continue; // skip if missing URL
+
+  // Ensure trailing slash
+  if (!profileUrl.endsWith("/")) {
+    profileUrl += "/";
+  }
+
+  // Ensure "www." in domain
+  profileUrl = profileUrl.replace(
+    /^https:\/\/(linkedin\.com)/i,
+    "https://www.$1"
+  );
+
+  console.log(profileUrl);
+
+  await LinkedInUserData.update(
+    {
+      followersCount: item.linkedinFollowersCount || 0,
+      connectionsCount: item.linkedinConnectionsCount || 0
+    },
+    {
+      where: { profileUrl }
+    }
+  );
+}
+
+}
+resolve(JSON.parse(resultObject));
+        } else {
+          setTimeout(poll, pollInterval);
+        }
+      } catch (err) {
+        // You can retry or reject depending on your preference
+        setTimeout(poll, pollInterval);
+      }
+    };
+    poll();
+  });
+}

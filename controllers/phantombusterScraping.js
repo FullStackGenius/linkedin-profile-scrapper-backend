@@ -14,9 +14,9 @@ exports.phantombusterScraping = async (req, res) => {
     //   identityId,
       sessionCookie,
       linkedInSearchUrl,
-      numberOfLinesPerLaunch = 2,
-      numberOfResultsPerLaunch = 2,
-      numberOfResultsPerSearch = 2,
+      numberOfLinesPerLaunch = 10,
+      numberOfResultsPerLaunch = 10,
+      numberOfResultsPerSearch = 10,
       //  numberOfResultsPerLaunch = 10, // how many total results to return in one run (e.g., 5 results).
       // numberOfResultsPerSearch = 10, //how many pages/searches to process per run (e.g., 2 searches).
     } = req.body;
@@ -68,14 +68,14 @@ exports.phantombusterScraping = async (req, res) => {
     );
 
     const containerId = launchRes.data.containerId;
-    console.log(`🚀 Agent launched. Polling container ID: ${containerId}`);
+    //console.log(`🚀 Agent launched. Polling container ID: ${containerId}`);
 
     // 🟢 4. Poll for results
     const pollForResult = async () => {
       const resultUrl = `https://api.phantombuster.com/api/v2/containers/fetch-result-object?id=${containerId}`;
 
       const poll = async () => {
-        console.log("⏳ Checking result...");
+       // console.log("⏳ Checking result...");
 
         try {
           const response = await axios.get(resultUrl, {
@@ -148,7 +148,7 @@ exports.phantombusterScraping = async (req, res) => {
 
     // 5️⃣ Save CSV file
     fs.writeFileSync(csvFilePath, csvContent, 'utf8');
-    console.log(`✅ CSV file created at: ${csvFilePath}`);
+    //console.log(`✅ CSV file created at: ${csvFilePath}`);
 
     // 6️⃣ Use this file for second PhantomBuster agent
     // If your second agent accepts public URL, you need to upload this CSV somewhere (like your server's /public folder)
@@ -183,7 +183,7 @@ exports.phantombusterScraping = async (req, res) => {
     );
 
     const containerId2 = launchRes2.data.containerId;
-    console.log(`🚀 Second agent launched. Container ID: ${containerId2}`);
+    //console.log(`🚀 Second agent launched. Container ID: ${containerId2}`);
 
     // Poll for second agent result
     const secondAgentData = await pollPhantomResult(containerId2, process.env.API_KEY);
@@ -198,11 +198,11 @@ exports.phantombusterScraping = async (req, res) => {
               data: JSON.parse(resultObject)
             });
           } else {
-            console.log("⌛ Result not ready yet. Retrying in 5s...");
+           // console.log("⌛ Result not ready yet. Retrying in 5s...");
             setTimeout(poll, process.env.POLL_INTERVAL_MS);
           }
         } catch (err) {
-          console.error("❌ Error polling result:", err?.response?.data || err.message);
+          //console.error("❌ Error polling result:", err?.response?.data || err.message);
           setTimeout(poll, process.env.POLL_INTERVAL_MS);
         }
       };
@@ -212,7 +212,7 @@ exports.phantombusterScraping = async (req, res) => {
 
     await pollForResult();
   } catch (error) {
-    console.error("❌ Phantombuster Scraping Error:", error?.response?.data || error.message);
+    //console.error("❌ Phantombuster Scraping Error:", error?.response?.data || error.message);
 
     return res.status(500).json({
       status: false,
@@ -315,22 +315,50 @@ async function pollPhantomResult(containerId, apiKey, pollInterval = 5000) {
           const parsedData = JSON.parse(resultObject);
 console.log(parsedData);
 if (Array.isArray(parsedData)) {
-  for (const item of parsedData) {
-    const profileUrl = item.linkedinProfileUrl; // match field name
+//   for (const item of parsedData) {
+//     const profileUrl = item.linkedinProfileUrl+"/"; // match field name
 
-    if (!profileUrl) continue; // skip if missing URL
-console.log(profileUrl);
-    // Example: item.followerCount & item.connectionCount come from LinkedIn data
-    await LinkedInUserData.update(
-      {
-        followersCount: item.linkedinFollowersCount || 0,
-        connectionsCount: item.linkedinConnectionsCount || 0
-      },
-      {
-        where: { profile_url: profileUrl }
-      }
-    );
+//     if (!profileUrl) continue; // skip if missing URL
+// console.log(profileUrl);
+//     // Example: item.followerCount & item.connectionCount come from LinkedIn data
+//     await LinkedInUserData.update(
+//       {
+//         followersCount: item.linkedinFollowersCount || 0,
+//         connectionsCount: item.linkedinConnectionsCount || 0
+//       },
+//       {
+//         where: { profile_url: profileUrl }
+//       }
+//     );
+//   }
+for (const item of parsedData) {
+  let profileUrl = item.linkedinProfileUrl?.trim();
+
+  if (!profileUrl) continue; // skip if missing URL
+
+  // Ensure trailing slash
+  if (!profileUrl.endsWith("/")) {
+    profileUrl += "/";
   }
+
+  // Ensure "www." in domain
+  profileUrl = profileUrl.replace(
+    /^https:\/\/(linkedin\.com)/i,
+    "https://www.$1"
+  );
+
+  console.log(profileUrl);
+
+  await LinkedInUserData.update(
+    {
+      followersCount: item.linkedinFollowersCount || 0,
+      connectionsCount: item.linkedinConnectionsCount || 0
+    },
+    {
+      where: { profileUrl }
+    }
+  );
+}
 }
 resolve(JSON.parse(resultObject));
         } else {
