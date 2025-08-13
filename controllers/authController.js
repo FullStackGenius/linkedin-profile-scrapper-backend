@@ -125,9 +125,6 @@ exports.login = async (req, res) => {
 };
 
 
-// exports.protected = (req, res) => {
-//   res.json({ message: 'This is a protected route', user: req.user });
-// };
 
 
 exports.profile = async (req, res) => {
@@ -167,75 +164,6 @@ console.log(userInstance);
     });
   }
 };
-
-
-
-// exports.googleLogin = async (req, res) => {
-//   const { token } = req.body;
-
-//   if (!token) {
-//     return res.status(400).json({
-//       status: false,
-//       message: 'Google token is required'
-//     });
-//   }
-
-//   try {
-//     // Verify Google ID token
-//     const ticket = await client.verifyIdToken({
-//       idToken: token,
-//       audience: process.env.GOOGLE_CLIENT_ID
-//     });
-
-//     const payload = ticket.getPayload();
-//     const { email, name, sub: googleId } = payload;
-
-//     // Find or create user
-//     let user = await User.findOne({ where: { email } });
-
-//     if (!user) {
-//       // Create new user if not exists
-//       user = await User.create({
-//         email,
-//         name: name || 'Google User',
-//         googleId,
-//         password: '' // No password for Google users
-//       });
-//     } else if (!user.googleId) {
-//       // Link Google ID to existing user if not already linked
-//       user.googleId = googleId;
-//       await user.save();
-//     }
-
-//     // Generate JWT token
-//     const jwtToken = jwt.sign(
-//       { id: user.id, email: user.email },
-//       process.env.JWT_SECRET,
-//       { expiresIn: '1h' }
-//     );
-
-//     return res.status(200).json({
-//       status: true,
-//       message: 'Google login successful',
-//       data: {
-//         user: {
-//           id: user.id,
-//           name: user.name,
-//           email: user.email
-//         },
-//         token: jwtToken
-//       }
-//     });
-//   } catch (err) {
-//     return res.status(500).json({
-//       status: false,
-//       message: 'Google login failed',
-//       error: err.message
-//     });
-//   }
-// };
-
-
 
 exports.googleLogin = async (req, res) => {
   const { token } = req.body;

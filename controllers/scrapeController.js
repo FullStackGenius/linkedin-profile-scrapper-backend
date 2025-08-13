@@ -8,7 +8,6 @@ exports.scrapeLinkedInKeywords = async (req, res) => {
     const keywords = req.body.profileUrl;
 
     const response = await axios.post(
-      // "https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_l1viktl72bvl7bjuj0&endpoint=https%3A%2F%2Fobsidiantechno.com%2Fabctest%2Fwebhook.php&format=json&uncompressed_webhook=true&force_deliver=true&include_errors=true",
        "https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_l1viktl72bvl7bjuj0&endpoint=https%3A%2F%2Flinkedin-be.obsidiantechno.com%2Fapi%2FscrapeLinkedInDataInsert&format=json&uncompressed_webhook=true&force_deliver=true&include_errors=true",
       JSON.stringify(keywords),
       {
@@ -19,7 +18,6 @@ exports.scrapeLinkedInKeywords = async (req, res) => {
       }
     );
 
-    // console.log("BrightData Trigger Response:", response.data);
     // Send basic response
     return res.status(200).json({
       status: true,
