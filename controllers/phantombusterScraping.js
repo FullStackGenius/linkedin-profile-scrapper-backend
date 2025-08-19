@@ -22,7 +22,7 @@ exports.phantombusterScraping = async (req, res) => {
       });
     }
 
-    const POLL_INTERVAL_MS = 5000;
+    // const POLL_INTERVAL_MS = 5000;
 
     // 🟢 2. Prepare headers and payload
     const headers = {
@@ -181,7 +181,7 @@ exports.phantombusterScraping = async (req, res) => {
               id: process.env.PHANTOM_PROFILE_SCRAPER_ID,
               argument: {
                 spreadsheetUrl,
-                sessionCookie: process.env.LINKEDIN_SESSION_COOKIE,
+                sessionCookie,
                 numberOfLinesPerLaunch: 10,
                 columnName: "profileUrl",
               },
