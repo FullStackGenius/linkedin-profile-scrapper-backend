@@ -8,21 +8,10 @@ module.exports = {
       allowNull: true,
       unique: true
     });
-    /**
-     * Add altering commands here.
-     *
-     * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
-     */
+    
   },
 
   async down (queryInterface, Sequelize) {
     await queryInterface.removeColumn('users', 'google_id');
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
   }
 };

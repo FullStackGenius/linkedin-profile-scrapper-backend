@@ -4,7 +4,7 @@ const path = require('path');
 require('dotenv').config();
 const sequelize = require('./config/db');
 require('./models/User'); 
-require('./models/LinkedInProfile'); 
+
 
 const authRoutes = require('./routes/authRoutes');
 const app = express();
@@ -17,7 +17,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api', authRoutes);
-// app.use(express.static(path.join(process.cwd(), 'public')));
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 
