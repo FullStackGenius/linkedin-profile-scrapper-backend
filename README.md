@@ -21,25 +21,25 @@ Create a `.env` file in the project root. Use `.env.example` as a reference.
 
 ## env file
 ## Database
-DB_NAME=linkedin_app
-DB_USER=root
-DB_PASSWORD=
-DB_HOST=localhost
-NODE_ENV=development or production
+- DB_NAME=linkedin_app
+- DB_USER=root
+- DB_PASSWORD=
+- DB_HOST=localhost
+- NODE_ENV=development or production
 
 # Server
-PORT=2000
-JWT_SECRET=supersecret
+- PORT=2000
+- JWT_SECRET=supersecret
 
 # Google OAuth
 GOOGLE_CLIENT_ID=
 
 # Phantombuster Integration
-API_KEY=your-phantombuster-api-key
-AGENT_ID=phantombuster-agent-id
-POLL_INTERVAL_MS=60000
-BASE_URL=http://localhost:2000
-PHANTOM_PROFILE_SCRAPER_ID=phantombuster-scraper-id
+- API_KEY=your-phantombuster-api-key
+- AGENT_ID=phantombuster-agent-id
+- POLL_INTERVAL_MS=60000
+- BASE_URL=http://localhost:2000
+- PHANTOM_PROFILE_SCRAPER_ID=phantombuster-scraper-id
 
 
 ## ⚙️ how to run project
