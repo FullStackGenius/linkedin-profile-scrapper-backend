@@ -46,8 +46,8 @@ PHANTOM_PROFILE_SCRAPER_ID=phantombuster-scraper-id
 
 Clone the repository
 
-git clone https://github.com/yourusername/linkedin-scraper-backend.git
-cd linkedin-scraper-backend
+git clone https://github.com/FullStackGenius/linkedin-profile-scrapper-backend.git
+cd linkedin-profile-scrapper-backend
 
 
 ## Install dependencies
